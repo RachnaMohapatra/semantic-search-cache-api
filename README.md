@@ -1,4 +1,5 @@
 # Semantic Search API with Intelligent Caching
+FastAPI based semantic search system using Sentence Transformers and FAISS with an intelligent caching layer for faster repeated queries.
 
 A semantic document search system built using **Sentence Transformers, FAISS, and FastAPI**.
 The system retrieves documents based on **semantic meaning instead of keyword matching** and uses a **semantic cache** to improve performance for repeated or similar queries.
@@ -162,11 +163,13 @@ http://localhost:8000/docs
 
 ## Example Queries
 
-mars exploration missions
-nasa missions to mars
-hockey team players
-car engine performance
-medical disease treatment
+Try queries like:
+
+- mars exploration missions
+- nasa missions to mars
+- hockey team players
+- car engine performance
+- medical disease treatment
 
 Similar queries may trigger **cache hits**, demonstrating the semantic caching mechanism.
 
@@ -174,6 +177,10 @@ Similar queries may trigger **cache hits**, demonstrating the semantic caching m
 
 ## Author
 
-Rachna Mohapatra
-Electronics and Computer Engineering
-Interest areas: AI Systems, Semantic Search, and Machine Learning Infrastructure
+**Rachna Mohapatra**  
+Electronics and Computer Engineering  
+
+Interests:
+- AI Systems
+- Semantic Search
+- Machine Learning Infrastructure
