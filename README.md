@@ -1,34 +1,35 @@
 # Semantic Search API with Intelligent Caching
 
-FastAPI based semantic search system using **Sentence Transformers** and **FAISS** with an intelligent caching layer for faster repeated queries.
+A semantic document search system built using **Sentence Transformers, FAISS, and FastAPI**.  
+The system retrieves documents based on **semantic meaning rather than keyword matching** and uses a **semantic cache** to improve performance for repeated or similar queries.
 
-This project implements a semantic document search system that retrieves documents based on **semantic meaning instead of keyword matching** and uses a **semantic cache** to improve performance for repeated or similar queries.
-
----
-
-## Key Features
-
-* Semantic document search using **Sentence Transformer embeddings**
-* Fast similarity retrieval using **FAISS vector database**
-* Fuzzy clustering of documents using **Gaussian Mixture Models**
-* **Semantic caching** to reuse results for similar queries
-* REST API built with **FastAPI**
-* Interactive API testing using **Swagger UI**
-* Containerized deployment using **Docker**
+This project demonstrates an end-to-end semantic retrieval pipeline including **embedding generation, vector search, caching, API development, and a frontend UI**.
 
 ---
 
-## Dataset
+# Key Features
 
-This project uses the **20 Newsgroups dataset**, a well-known dataset containing approximately **18,846 discussion posts** across multiple topics such as:
+• Semantic document search using **Sentence Transformer embeddings**  
+• Fast similarity retrieval using **FAISS vector database**  
+• **Semantic caching layer** for faster repeated queries  
+• REST API built with **FastAPI**  
+• Interactive API testing using **Swagger UI**  
+• **Frontend search interface** for querying the API  
+• Containerized deployment using **Docker**
 
-* Space
-* Sports
-* Politics
-* Religion
-* Technology
-* Medicine
-* Automobiles
+---
+
+# Dataset
+
+This project uses the **20 Newsgroups dataset**, containing approximately **18,846 discussion posts** across multiple topics including:
+
+- Space
+- Sports
+- Politics
+- Religion
+- Technology
+- Medicine
+- Automobiles
 
 After preprocessing and cleaning, the documents are stored in:
 
@@ -36,54 +37,53 @@ After preprocessing and cleaning, the documents are stored in:
 clean_documents.txt
 ```
 
-Each line represents a single cleaned document used for semantic search.
+Each line represents **one document used for semantic search**.
 
 ---
 
-## System Architecture
+# System Architecture
 
 ```
 User Query
    ↓
-Sentence Transformer → Convert query to embedding
+Sentence Transformer
    ↓
-Cluster Detection
+Query Embedding
    ↓
 Check Semantic Cache
-```
-
-If similar query exists → **Cache Hit** → Return cached results
-
-Else → **Cache Miss**
-
-```
+   ↓
+Cache HIT → Return Cached Results
+   ↓
+Cache MISS
+   ↓
 FAISS Vector Search
    ↓
 Retrieve Top Similar Documents
    ↓
-Store query + results in cache
+Store Results in Cache
    ↓
 Return API Response
 ```
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-* Python
-* FastAPI
-* Sentence Transformers
-* FAISS (Facebook AI Similarity Search)
-* Scikit-learn
-* NumPy
-* Docker
-* Uvicorn
+- Python
+- FastAPI
+- Sentence Transformers
+- FAISS (Facebook AI Similarity Search)
+- Scikit-learn
+- NumPy
+- Docker
+- Uvicorn
+- HTML / CSS / JavaScript (Frontend)
 
 ---
 
-## API Endpoints
+# API Endpoints
 
-### Search Documents
+## Search Documents
 
 ```
 POST /query
@@ -116,7 +116,7 @@ Example Response
 
 ---
 
-### Cache Statistics
+## Cache Statistics
 
 ```
 GET /cache/stats
@@ -135,7 +135,7 @@ Example Response
 
 ---
 
-### Clear Cache
+## Clear Cache
 
 ```
 DELETE /cache
@@ -145,45 +145,79 @@ Clears all cached queries.
 
 ---
 
-## Running the Project
+# Frontend UI
 
-Install dependencies
+A simple search interface is included to interact with the API.
+
+Open:
 
 ```
+frontend/index.html
+```
+
+The interface allows users to:
+
+• Enter semantic queries  
+• View retrieved documents  
+• Observe **cache hits and misses**
+
+---
+
+# Running the Project
+
+## 1. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-Run the API server
+---
 
-```
+## 2. Start the FastAPI server
+
+```bash
 uvicorn app:app --reload --port 8000
 ```
 
-Open API documentation
+---
+
+## 3. Open API documentation
 
 ```
 http://127.0.0.1:8000/docs
 ```
 
-Swagger UI allows you to interactively test all API endpoints.
+Swagger UI allows you to **interactively test all endpoints**.
 
 ---
 
-## Docker Deployment
+## 4. Launch the frontend UI
+
+Open:
+
+```
+frontend/index.html
+```
+
+Then search queries directly from the browser.
+
+---
+
+# Docker Deployment
 
 Build Docker image
 
-```
+```bash
 docker build -t semantic-cache-api .
 ```
 
 Run container
 
-```
+```bash
 docker run -p 8000:8000 semantic-cache-api
 ```
 
-Then open:
+Open:
 
 ```
 http://localhost:8000/docs
@@ -191,27 +225,29 @@ http://localhost:8000/docs
 
 ---
 
-## Example Queries
+# Example Queries
 
-Try queries like:
+Try queries such as:
 
-* mars exploration missions
-* nasa missions to mars
-* hockey team players
-* car engine performance
-* medical disease treatment
+```
+mars exploration missions
+nasa missions to mars
+hockey team players
+car engine performance
+medical disease treatment
+```
 
-Similar queries may trigger **cache hits**, demonstrating the semantic caching mechanism.
+Running similar queries repeatedly demonstrates the **semantic caching mechanism**.
 
 ---
 
-## Author
+# Author
 
-**Rachna Mohapatra**
+**Rachna Mohapatra**  
 Electronics and Computer Engineering
 
 Interests:
 
-* AI Systems
-* Semantic Search
-* Machine Learning Infrastructure
+- AI Systems
+- Semantic Search
+- Machine Learning Infrastructure
