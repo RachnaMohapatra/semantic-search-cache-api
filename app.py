@@ -1,19 +1,29 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
+from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 import faiss
 
 app = FastAPI()
 
-# Load embedding model
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Load model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# ---- LOAD DATASET ----
+# Load dataset
 with open("clean_documents.txt", "r", encoding="utf-8") as f:
     clean_documents = [line.strip() for line in f.readlines()]
 
-# ---- CREATE EMBEDDINGS ----
+# Create embeddings
 doc_embeddings = model.encode(clean_documents)
 
 dimension = doc_embeddings.shape[1]
@@ -21,7 +31,7 @@ dimension = doc_embeddings.shape[1]
 index = faiss.IndexFlatL2(dimension)
 index.add(np.array(doc_embeddings))
 
-# ---- CACHE ----
+# Cache
 semantic_cache = {}
 hit_count = 0
 miss_count = 0
@@ -43,24 +53,26 @@ def query_endpoint(request: QueryRequest):
 
     query = request.query
 
-    # ----- CACHE CHECK -----
+    # Cache check
     if query in semantic_cache:
         hit_count += 1
-        return semantic_cache[query]
+        response = semantic_cache[query]
+        response["cache_hit"] = True
+        return response
 
-    # ----- COMPUTE EMBEDDING -----
+    # Compute embedding
     query_embedding = model.encode([query])
 
-    # ----- FAISS SEARCH -----
-    distances, indices = index.search(np.array(query_embedding), k=3)
+    # FAISS search
+    distances, indices = index.search(np.array(query_embedding), k=5)
 
     results = [
-    {
-        "text": clean_documents[i][:250],
-        "distance": float(distances[0][idx])
-    }
-    for idx, i in enumerate(indices[0])
-]
+        {
+            "text": clean_documents[i][:250],
+            "distance": float(distances[0][idx])
+        }
+        for idx, i in enumerate(indices[0])
+    ]
 
     response = {
         "query": query,
@@ -71,7 +83,6 @@ def query_endpoint(request: QueryRequest):
     }
 
     semantic_cache[query] = response
-
     miss_count += 1
 
     return response
@@ -81,7 +92,6 @@ def query_endpoint(request: QueryRequest):
 def cache_stats():
 
     total = hit_count + miss_count
-
     hit_rate = (hit_count / total) * 100 if total > 0 else 0
 
     return {

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Semantic Search Engine</title>
+
+<style>
+
+body{
+margin:0;
+font-family:'Segoe UI', sans-serif;
+background:
+linear-gradient(rgba(255,255,255,0.25),rgba(255,255,255,0.25)),
+url("https://images.unsplash.com/photo-1451187580459-43490279c0fa");
+background-size:cover;
+background-attachment:fixed;
+color:#222;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+padding-top:100px;
+text-align:center;
+backdrop-filter: blur(8px);
+}
+
+.logo{
+width:70px;
+margin-bottom:10px;
+animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-8px)}
+100%{transform:translateY(0)}
+}
+
+.title{
+font-size:46px;
+font-weight:bold;
+color:#c8a23a;
+}
+
+.subtitle{
+opacity:0.7;
+margin-bottom:30px;
+}
+
+.tagline{
+font-size:14px;
+margin-bottom:40px;
+opacity:0.7;
+}
+
+.search-box{
+display:flex;
+justify-content:center;
+margin-bottom:20px;
+}
+
+input{
+width:600px;
+padding:15px;
+font-size:16px;
+border-radius:10px 0 0 10px;
+border:1px solid #ddd;
+outline:none;
+}
+
+button{
+padding:15px 25px;
+font-size:16px;
+background:#c8a23a;
+color:white;
+border:none;
+border-radius:0 10px 10px 0;
+cursor:pointer;
+transition:0.2s;
+}
+
+button:hover{
+background:#b08d2d;
+}
+
+.cache{
+margin-top:15px;
+font-weight:bold;
+}
+
+.hit{
+color:green;
+}
+
+.miss{
+color:red;
+}
+
+.loading{
+margin-top:15px;
+font-size:14px;
+opacity:0.7;
+}
+
+.results{
+margin-top:40px;
+text-align:left;
+}
+
+.card{
+background:white;
+padding:22px;
+border-radius:12px;
+margin-bottom:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+opacity:0;
+transform:translateY(20px);
+}
+
+.card.show{
+opacity:1;
+transform:translateY(0);
+transition:all 0.4s ease;
+}
+
+.card h3{
+margin-top:0;
+color:#c8a23a;
+}
+
+.distance{
+font-size:12px;
+opacity:0.6;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<img class="logo" src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
+
+<div class="title">Semantic Search</div>
+<div class="subtitle">FastAPI • Sentence Transformers • FAISS</div>
+<div class="tagline">⚡ AI Powered Semantic Document Retrieval</div>
+
+<div class="search-box">
+<input id="query" placeholder="Search anything...">
+<button onclick="search()">Search</button>
+</div>
+
+<div id="loading" class="loading" style="display:none">
+Searching...
+</div>
+
+<div id="cacheStatus" class="cache"></div>
+
+<div id="results" class="results"></div>
+
+</div>
+
+<script>
+
+document.getElementById("query").addEventListener("keypress",function(e){
+if(e.key==="Enter"){
+search()
+}
+})
+
+async function search(){
+
+const query=document.getElementById("query").value
+
+if(query===""){
+alert("Please enter a search query")
+return
+}
+
+document.getElementById("loading").style.display="block"
+
+try{
+
+const response=await fetch("http://127.0.0.1:8000/query",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({query:query})
+})
+
+const data=await response.json()
+
+document.getElementById("loading").style.display="none"
+
+const resultsDiv=document.getElementById("results")
+resultsDiv.innerHTML=""
+
+const cacheDiv=document.getElementById("cacheStatus")
+
+if(data.cache_hit){
+cacheDiv.innerHTML="🟢 Cache HIT"
+cacheDiv.className="cache hit"
+}else{
+cacheDiv.innerHTML="🔴 Cache MISS"
+cacheDiv.className="cache miss"
+}
+
+data.results.forEach((item,i)=>{
+
+const card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+<h3>Result ${i+1}</h3>
+<p>${item.text.substring(0,180)}...</p>
+<div class="distance">
+Similarity Score: ${(1-item.distance).toFixed(3)}
+</div>
+`
+
+resultsDiv.appendChild(card)
+
+setTimeout(()=>{
+card.classList.add("show")
+},100)
+
+})
+
+}catch(error){
+
+document.getElementById("loading").style.display="none"
+alert("Backend server not running")
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
