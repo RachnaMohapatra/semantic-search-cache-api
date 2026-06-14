@@ -1,253 +1,332 @@
-# Semantic Search API with Intelligent Caching
+# Semantic Product Search Engine with Intelligent Caching
 
-A semantic document search system built using **Sentence Transformers, FAISS, and FastAPI**.  
-The system retrieves documents based on **semantic meaning rather than keyword matching** and uses a **semantic cache** to improve performance for repeated or similar queries.
+A semantic product search engine built using **Sentence Transformers, FAISS, FastAPI, and Intelligent Query Caching**.
 
-This project demonstrates an end-to-end semantic retrieval pipeline including **embedding generation, vector search, caching, API development, and a frontend UI**.
+Unlike traditional keyword-based search systems, this project retrieves products based on their semantic meaning, enabling users to discover relevant products even when exact keywords are not present.
 
----
-
-# Key Features
-
-• Semantic document search using **Sentence Transformer embeddings**  
-• Fast similarity retrieval using **FAISS vector database**  
-• **Semantic caching layer** for faster repeated queries  
-• REST API built with **FastAPI**  
-• Interactive API testing using **Swagger UI**  
-• **Frontend search interface** for querying the API  
-• Containerized deployment using **Docker**
+The system combines transformer-based embeddings, vector similarity search, caching, and REST APIs to create a scalable and efficient semantic retrieval pipeline.
 
 ---
 
-# Dataset
+## Features
 
-This project uses the **20 Newsgroups dataset**, containing approximately **18,846 discussion posts** across multiple topics including:
+### Semantic Search
 
-- Space
-- Sports
-- Politics
-- Religion
-- Technology
-- Medicine
-- Automobiles
+Uses Sentence Transformer embeddings to understand the intent and meaning behind user queries.
 
-After preprocessing and cleaning, the documents are stored in:
+### Vector Similarity Search
 
+Uses FAISS (Facebook AI Similarity Search) for fast nearest-neighbor retrieval over thousands of product embeddings.
+
+### Intelligent Query Caching
+
+Frequently searched queries are stored in cache.
+
+Benefits:
+
+* Faster repeated searches
+* Reduced computation
+* Improved response time
+
+### Cache Monitoring
+
+Tracks:
+
+* Cache Hits
+* Cache Misses
+* Hit Rate
+* Total Cache Entries
+
+### FastAPI Backend
+
+REST API endpoints for:
+
+* Product Search
+* Cache Statistics
+* Cache Management
+
+### Interactive API Documentation
+
+FastAPI automatically generates Swagger UI documentation for testing and exploring endpoints.
+
+---
+
+## Dataset
+
+The project uses a Flipkart Product Dataset containing approximately 12,000+ products across multiple categories.
+
+Categories include:
+
+* Electronics
+* Mobile Accessories
+* Earbuds
+* Headphones
+* Speakers
+* Home Appliances
+* Furniture
+* Lifestyle Products
+
+The raw dataset is stored as:
+
+```text
+data/dataset.csv
 ```
+
+The processed search corpus is stored as:
+
+```text
 clean_documents.txt
 ```
 
-Each line represents **one document used for semantic search**.
+Each document contains structured product information including:
+
+* Product Title
+* Description
+* Product Rating
+* Seller Rating
+* Selling Price
+* Category Information
 
 ---
 
-# System Architecture
+## Embedding Model
 
+The project uses:
+
+```text
+all-MiniLM-L6-v2
 ```
+
+from Sentence Transformers.
+
+This model converts product documents and user queries into dense vector embeddings for semantic retrieval.
+
+---
+
+## Search Pipeline
+
+```text
 User Query
-   ↓
+     │
+     ▼
 Sentence Transformer
-   ↓
+     │
+     ▼
 Query Embedding
-   ↓
-Check Semantic Cache
-   ↓
-Cache HIT → Return Cached Results
-   ↓
-Cache MISS
-   ↓
-FAISS Vector Search
-   ↓
-Retrieve Top Similar Documents
-   ↓
-Store Results in Cache
-   ↓
-Return API Response
+     │
+     ▼
+Cache Check
+     │
+ ┌───┴────┐
+ │        │
+ ▼        ▼
+Hit      Miss
+ │        │
+ │        ▼
+ │    FAISS Search
+ │        │
+ │        ▼
+ │   Top Results
+ │        │
+ └────────┘
+      │
+      ▼
+Return Response
 ```
 
 ---
 
-# Tech Stack
+## Technologies Used
 
-- Python
-- FastAPI
-- Sentence Transformers
-- FAISS (Facebook AI Similarity Search)
-- Scikit-learn
-- NumPy
-- Docker
-- Uvicorn
-- HTML / CSS / JavaScript (Frontend)
+* Python
+* FastAPI
+* Sentence Transformers
+* FAISS
+* NumPy
+* Pandas
+* Scikit-Learn
+* Uvicorn
+* HTML
+* CSS
+* JavaScript
+* Docker
 
 ---
 
-# API Endpoints
+## Project Structure
 
-## Search Documents
+```text
+semantic-search-engine/
 
+├── app.py
+├── README.md
+├── requirements.txt
+├── Dockerfile
+
+├── clean_documents.txt
+├── product_embeddings.npy
+├── product_index.faiss
+
+├── 01_dataset_and_embeddings.ipynb
+
+├── index.html
+
+├── data/
+│   └── dataset.csv
+
+└── .gitignore
 ```
+
+---
+
+## API Endpoints
+
+### Home
+
+```http
+GET /
+```
+
+Response:
+
+```json
+{
+  "message": "Semantic Product Search API Running"
+}
+```
+
+---
+
+### Search Products
+
+```http
 POST /query
 ```
 
-Example Request
+Request:
 
 ```json
 {
-  "query": "mars exploration missions"
+  "query": "wireless earbuds under 1000"
 }
 ```
 
-Example Response
+Response:
 
 ```json
 {
-  "query": "mars exploration missions",
+  "query": "wireless earbuds under 1000",
   "cache_hit": false,
-  "similarity_score": 0.32,
-  "dominant_cluster": 0,
-  "results": [
-    {
-      "text": "NASA launched a Mars rover mission to study planetary geology.",
-      "distance": 0.68
-    }
-  ]
+  "top_match_id": 2019,
+  "distance": 0.76,
+  "results": [...]
 }
 ```
 
 ---
 
-## Cache Statistics
+### Cache Statistics
 
-```
+```http
 GET /cache/stats
 ```
 
-Example Response
+Response:
 
 ```json
 {
-  "total_entries": 5,
-  "hit_count": 2,
-  "miss_count": 3,
-  "hit_rate": "40%"
+  "total_queries": 2,
+  "cache_entries": 1,
+  "hit_count": 1,
+  "miss_count": 1,
+  "hit_rate": "50.00%"
 }
 ```
 
 ---
 
-## Clear Cache
+### Clear Cache
 
-```
+```http
 DELETE /cache
 ```
 
-Clears all cached queries.
+Clears all cached queries and resets cache statistics.
 
 ---
 
-# Frontend UI
+## Running the Project
 
-A simple search interface is included to interact with the API.
-
-Open:
-
-```
-frontend/index.html
-```
-
-The interface allows users to:
-
-• Enter semantic queries  
-• View retrieved documents  
-• Observe **cache hits and misses**
-
----
-
-# Running the Project
-
-## 1. Install dependencies
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-## 2. Start the FastAPI server
+### Start FastAPI Server
 
 ```bash
-uvicorn app:app --reload --port 8000
+uvicorn app:app --reload
 ```
 
----
+### Open Swagger Documentation
 
-## 3. Open API documentation
-
-```
+```text
 http://127.0.0.1:8000/docs
 ```
 
-Swagger UI allows you to **interactively test all endpoints**.
-
 ---
 
-## 4. Launch the frontend UI
+## Sample Queries
 
-Open:
+```text
+wireless earbuds under 1000
 
-```
-frontend/index.html
-```
+bluetooth speaker
 
-Then search queries directly from the browser.
+soundbar under 1000
 
----
+gaming headphones
 
-# Docker Deployment
-
-Build Docker image
-
-```bash
-docker build -t semantic-cache-api .
-```
-
-Run container
-
-```bash
-docker run -p 8000:8000 semantic-cache-api
-```
-
-Open:
-
-```
-http://localhost:8000/docs
+wireless earbuds under 500
 ```
 
 ---
 
-# Example Queries
+## Experimental Work
 
-Try queries such as:
+The accompanying notebook includes additional experimentation with:
 
-```
-mars exploration missions
-nasa missions to mars
-hockey team players
-car engine performance
-medical disease treatment
-```
+* PCA (Principal Component Analysis)
+* Gaussian Mixture Model (GMM) Clustering
+* Cluster Analysis
+* Semantic Cache Exploration
 
-Running similar queries repeatedly demonstrates the **semantic caching mechanism**.
+These experiments were used to analyze product embedding distributions and clustering behavior.
 
 ---
 
-# Author
+## Future Improvements
 
-**Rachna Mohapatra**  
+* Personalized Recommendations
+* Hybrid Semantic + Keyword Search
+* Real-Time Product Updates
+* Cluster-Aware Semantic Caching
+* Multi-Language Search
+* Retrieval-Augmented Product Assistant
+
+---
+
+## Author
+
+### Rachna Mohapatra
+
 Electronics and Computer Engineering
 
-Interests:
+Areas of Interest:
 
-- AI Systems
-- Semantic Search
-- Machine Learning Infrastructure
+* Artificial Intelligence
+* Semantic Search
+* Machine Learning Systems
+* Information Retrieval
+* AI Infrastructure
