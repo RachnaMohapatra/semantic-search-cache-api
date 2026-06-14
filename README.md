@@ -2,7 +2,7 @@
 
 A semantic product search engine built using **Sentence Transformers, FAISS, FastAPI, and Intelligent Query Caching**.
 
-Unlike traditional keyword-based search systems, this project retrieves products based on their semantic meaning, enabling users to discover relevant products even when exact keywords are not present.
+Unlike traditional keyword-based search systems, this project retrieves products based on their semantic meaning, allowing users to discover relevant products even when exact keywords are not present.
 
 The system combines transformer-based embeddings, vector similarity search, caching, and REST APIs to create a scalable and efficient semantic retrieval pipeline.
 
@@ -49,11 +49,15 @@ REST API endpoints for:
 
 FastAPI automatically generates Swagger UI documentation for testing and exploring endpoints.
 
+### Frontend Search Interface
+
+A simple HTML/CSS/JavaScript frontend is included for interacting with the API through a user-friendly search interface.
+
 ---
 
 ## Dataset
 
-The project uses a Flipkart Product Dataset containing approximately 12,000+ products across multiple categories.
+The project uses a Flipkart Product Dataset containing approximately **12,000+ products** across multiple categories.
 
 Categories include:
 
@@ -66,26 +70,11 @@ Categories include:
 * Furniture
 * Lifestyle Products
 
-The raw dataset is stored as:
+Dataset location:
 
 ```text
 data/dataset.csv
 ```
-
-The processed search corpus is stored as:
-
-```text
-clean_documents.txt
-```
-
-Each document contains structured product information including:
-
-* Product Title
-* Description
-* Product Rating
-* Seller Rating
-* Selling Price
-* Category Information
 
 ---
 
@@ -107,31 +96,25 @@ This model converts product documents and user queries into dense vector embeddi
 
 ```text
 User Query
-     │
-     ▼
-Sentence Transformer
-     │
-     ▼
-Query Embedding
-     │
-     ▼
-Cache Check
-     │
- ┌───┴────┐
- │        │
- ▼        ▼
-Hit      Miss
- │        │
- │        ▼
- │    FAISS Search
- │        │
- │        ▼
- │   Top Results
- │        │
- └────────┘
       │
       ▼
-Return Response
+Sentence Transformer
+      │
+      ▼
+Query Embedding
+      │
+      ▼
+Cache Check
+   ┌───────┐
+   │       │
+ HIT     MISS
+   │       │
+   │    FAISS Search
+   │       │
+   └──► Top Results
+            │
+            ▼
+      Return Response
 ```
 
 ---
@@ -156,25 +139,27 @@ Return Response
 ## Project Structure
 
 ```text
-semantic-search-engine/
-
+semantic-search-cache-api/
+│
 ├── app.py
 ├── README.md
 ├── requirements.txt
 ├── Dockerfile
-
+├── .gitignore
 ├── clean_documents.txt
-├── product_embeddings.npy
-├── product_index.faiss
-
-├── 01_dataset_and_embeddings.ipynb
-
-├── index.html
-
+│
 ├── data/
 │   └── dataset.csv
-
-└── .gitignore
+│
+├── models/
+│   ├── product_embeddings.npy
+│   └── product_index.faiss
+│
+├── frontend/
+│   └── index.html
+│
+└── notebooks/
+    └── 01_dataset_and_embeddings.ipynb
 ```
 
 ---
@@ -257,22 +242,42 @@ Clears all cached queries and resets cache statistics.
 
 ## Running the Project
 
-### Install Dependencies
+### 1. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Start FastAPI Server
+### 2. Start FastAPI Server
 
 ```bash
 uvicorn app:app --reload
 ```
 
-### Open Swagger Documentation
+### 3. Open Swagger Documentation
 
 ```text
 http://127.0.0.1:8000/docs
+```
+
+### 4. Open Frontend
+
+Open:
+
+```text
+frontend/index.html
+```
+
+or run a local server:
+
+```bash
+python -m http.server 5500
+```
+
+and visit:
+
+```text
+http://localhost:5500/frontend/index.html
 ```
 
 ---
@@ -281,13 +286,9 @@ http://127.0.0.1:8000/docs
 
 ```text
 wireless earbuds under 1000
-
 bluetooth speaker
-
 soundbar under 1000
-
 gaming headphones
-
 wireless earbuds under 500
 ```
 
@@ -319,7 +320,7 @@ These experiments were used to analyze product embedding distributions and clust
 
 ## Author
 
-### Rachna Mohapatra
+**Rachna Mohapatra**
 
 Electronics and Computer Engineering
 
@@ -327,6 +328,6 @@ Areas of Interest:
 
 * Artificial Intelligence
 * Semantic Search
-* Machine Learning Systems
+* Machine Learning
 * Information Retrieval
 * AI Infrastructure
